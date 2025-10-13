@@ -1,78 +1,40 @@
+import { createFood, getAllFoods } from "@/lib/services/food-service";
 import { NextRequest, NextResponse } from "next/server";
-import { uploadImageToCloudinary } from "@/lib/utils/uploadImage";
-import { FoodType } from "@/lib/utils/types";
 
 export async function GET() {
-    return Response.json({ data: "Hello from Food" });
+    const food = await getAllFoods();
+    return new NextResponse(JSON.stringify({ data: food }), {
+        status: 200,
+    });
 }
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
     try {
-        // Parse the formData from the request
-        const formData = await request.formData();
+        const form = await req.formData();
 
-        // Extract food fields from formData
-        const name = formData.get("name") as string;
-        const ingredients = formData.get("ingredients") as string;
-        const price = formData.get("price") as string;
-        const category = formData.get("category") as string;
-        const image = formData.get("image") as File;
+        // 🥗 FormData-с утгуудыг гаргаж авах
+        const foodName = form.get("name") as string;
+        const price = Number(form.get("price"));
+        const ingredients = form.get("ingredients") as string;
+        const category = form.get("category") as string;
+        const image = form.get("image") as File | null; // image нь File объект байна
 
-        // Console log the received data
-        console.log("========== Received Food Data ==========");
-        console.log("Name:", name);
-        console.log("ingredients:", ingredients);
-        console.log("Price:", price);
-        console.log("Category:", category);
-        console.log(
-            "Image:",
-            image ? `${image.name} (${image.size} bytes)` : "No image"
-        );
-        console.log("=======================================");
-
-        // Validate required fields
-        if (!name || !ingredients || !price || !category) {
-            return NextResponse.json(
-                { error: "Missing required fields" },
-                { status: 400 }
-            );
+        // ✅ validation
+        if (!foodName || !price || !ingredients || !category || !image) {
+            return NextResponse.json({ error: "All fields are required" }, { status: 400 });
         }
 
-        // Handle image upload if image exists
-        let imageUrl = "";
-        if (image) {
-            imageUrl = await uploadImageToCloudinary(image);
-        }
-
-        // Prepare the food data object
-        const foodData: FoodType = {
-            name,
+        // ⚙️ DB руу хадгалах (энд image URL эсвэл buffer дамжуулж болно)
+        await createFood({
+            foodName,
+            price,
             ingredients,
-            price: parseFloat(price),
             category,
-            image: imageUrl,
-        };
+            image
+        });
 
-        console.log("Final Food Data:", foodData);
-
-        // Return success response
-        return NextResponse.json(
-            {
-                success: true,
-                message: "Food item received and image uploaded successfully",
-                data: foodData,
-            },
-            { status: 201 }
-        );
+        return NextResponse.json({ message: "Food created successfully!" }, { status: 201 });
     } catch (error) {
-        console.error("Error processing food data:", error);
-        return NextResponse.json(
-            {
-                success: false,
-                error: "Failed to process food data",
-                details: error instanceof Error ? error.message : "Unknown error",
-            },
-            { status: 500 }
-        );
+        console.error("POST /api/food error:", error);
+        return NextResponse.json({ error: "Failed to create food" }, { status: 500 });
     }
 }
