@@ -14,7 +14,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log(body);
-    await createCategory(body.name);
+    await createCategory(body.newCategory);
     return new NextResponse(JSON.stringify({ message: "Category created" }), {
         status: 200,
     });
