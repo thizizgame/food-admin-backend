@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { categories } from "../data";
 
-
 export async function POST(req: Request) {
     const body = await req.json();
     const { category } = body;

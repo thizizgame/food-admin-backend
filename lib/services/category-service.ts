@@ -1,6 +1,5 @@
-import connectDB from "@/mongodb";
-import { Category } from "../models/category";
-
+import connectDB from "../mongodb";
+import { Category } from "../models/Category";
 
 export const createCategory = async (name: string) => {
     await connectDB();
