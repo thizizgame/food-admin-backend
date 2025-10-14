@@ -5,7 +5,7 @@ type NewFoodInput = {
     price: number;
     ingredients: string;
     category: string;
-    image: File | null;
+    image: string;
 };
 export const createFood = async ({ foodName, price, ingredients, category, image }: NewFoodInput) => {
     await connectDB();

@@ -1,4 +1,5 @@
 import { createFood, getAllFoods } from "@/lib/services/food-service";
+import { uploadImageToCloudinary } from "@/lib/utils/uploadImage";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
@@ -12,24 +13,24 @@ export async function POST(req: NextRequest) {
         const form = await req.formData();
 
         // 🥗 FormData-с утгуудыг гаргаж авах
-        const foodName = form.get("name") as string;
+        const foodName = form.get("foodName") as string;
         const price = Number(form.get("price"));
         const ingredients = form.get("ingredients") as string;
         const category = form.get("category") as string;
         const image = form.get("image") as File | null; // image нь File объект байна
-
+        console.log(foodName)
         // ✅ validation
         if (!foodName || !price || !ingredients || !category || !image) {
             return NextResponse.json({ error: "All fields are required" }, { status: 400 });
         }
-
-        // ⚙️ DB руу хадгалах (энд image URL эсвэл buffer дамжуулж болно)
+        const imageHandler = await uploadImageToCloudinary(image)
+        // ⚙️ DB руу хадгалах 
         await createFood({
-            foodName,
-            price,
-            ingredients,
-            category,
-            image
+            foodName: foodName,
+            price: price,
+            ingredients: ingredients,
+            category: category,
+            image: imageHandler
         });
 
         return NextResponse.json({ message: "Food created successfully!" }, { status: 201 });

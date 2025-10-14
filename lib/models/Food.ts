@@ -5,6 +5,7 @@ type FoodSchemaType = {
     price: number,
     image: string,
     ingredients: string,
+    category: string,
 };
 
 const FoodSchema = new Schema({
@@ -12,8 +13,9 @@ const FoodSchema = new Schema({
     price: Number,
     image: String,
     ingredients: String,
+    category: String,
 });
 
 export const Food =
-    mongoose.models.Category ||
+    mongoose.models.Food ||
     mongoose.model<FoodSchemaType>("Food", FoodSchema);
