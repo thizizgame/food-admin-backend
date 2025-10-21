@@ -5,11 +5,12 @@ import { NextResponse } from "next/server";
 export const POST = async (request: Request) => {
     await connectDB();
     const body = await request.json();
+    console.log("body", body);
     const { password, email } = body;
-    const hashPassword = bcrypt.hashSync(password, 10);
+
     const user = await User.create({
         email: email,
-        password: hashPassword,
+        password: password,
         role: "USER",
     });
     return NextResponse.json({ message: "Successfully created user", user })

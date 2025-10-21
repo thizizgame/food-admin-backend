@@ -1,4 +1,12 @@
 import mongoose, { Schema } from "mongoose";
+
+export type userType = {
+    email: string;
+    password: string;
+    address: string;
+    phoneNumber: string;
+    role: string;
+};
 const UserSchema = new Schema(
     {
         email: { type: String, required: true, unique: true },
@@ -13,4 +21,4 @@ const UserSchema = new Schema(
 );
 export const User =
     mongoose.models.User ||
-    mongoose.model("User", UserSchema);
+    mongoose.model<userType>("User", UserSchema);
